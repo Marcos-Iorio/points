@@ -1,3 +1,4 @@
+import LoginForm from "@/components/auth/login-form"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
@@ -18,7 +19,7 @@ export default async function LoginPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h1>
           <p className="text-sm text-muted-foreground">Ingresa tus credenciales para acceder a tu cuenta</p>
         </div>
-        asdads
+        <LoginForm/>
       </div>
     </div>
   )
