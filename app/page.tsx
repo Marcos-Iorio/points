@@ -7,6 +7,9 @@ export default function Home() {
       <Link href={"/login"}>
         Iniciar Sesión
       </Link>
+      <Link href={"/register"}>
+        Registro
+      </Link>
     </>
   );
 }
