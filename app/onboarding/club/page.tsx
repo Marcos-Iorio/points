@@ -9,18 +9,18 @@ export default async function ClubOnboardingPage() {
   } = await supabase.auth.getSession()
 
   if (!session) {
-    redirect("/login")
+    redirect("/auth/login")
   }
 
   // Verificar si ya tiene un club
   const { data: existingClub } = await supabase
     .from('clubs')
-    .select('id, name',)
-    .eq('user_id', session.user.id)
+    .select('id, name')
+    .eq('auth_user_id', session.user.id)
     .single()
 
   if (existingClub) {
-    redirect(`/club/${existingClub.name}/${existingClub.id}`)
+    redirect(`/club/${existingClub.id}/admin`)
   }
 
   return (
