@@ -46,7 +46,7 @@ const RegisterForm = () => {
                
                 if (data.session) {
                 
-                    router.push('/onboarding/club')
+                    router.push('/club/onboarding')
                 } else {
                     router.push('/auth/confirm')
                 }

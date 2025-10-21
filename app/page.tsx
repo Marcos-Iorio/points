@@ -4,10 +4,10 @@ import Link from "next/link";
 export default function Home() {
   return (
     <>
-      <Link href={"/login"}>
+      <Link href={"/auth/login"}>
         Iniciar Sesión
       </Link>
-      <Link href={"/register"}>
+      <Link href={"/auth/register"}>
         Registro
       </Link>
     </>

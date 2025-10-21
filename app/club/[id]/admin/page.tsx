@@ -1,29 +1,32 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server"
+import { AdminSideMenu } from "@/components/admin/admin-side-menu";
+import { CourtsStatusCard } from "@/components/admin/dashboard/courts-status-card";
+import { requireClubOwner } from "@/lib/auth";
 
-const ClubAdminPage = async ({params}: {params: Promise<{id: string}>}) => {
-    const {id} = await params
+const ClubAdminPage = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  const { id } = await params;
 
-    const supabase = await createClient()
+  // Verificar autenticación y ownership del club en una línea
+  const { user, club } = await requireClubOwner(id);
 
-    const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  return (
+    <div className="flex h-screen bg-background">
+      <AdminSideMenu clubId={id} userEmail={user.email} userName={club.name} />
+      <main className="flex-1 overflow-auto p-3">
+        <section className="bg-surface border border-border  rounded-lg p-5 h-full">
+          <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+          <p className="text-gray-600">
+            Bienvenido al panel de administración de {club.name}
+          </p>
+          <CourtsStatusCard clubId={club.id} />
+        </section>
+      </main>
+    </div>
+  );
+};
 
-  if(session) {
-    const { data, error } = await supabase
-    .from('clubs').select("*").match({
-        id,
-        "auth_user_id": session.user.id
-    })
-
-    console.log(data)
-  }
-
-        
-    return(
-        <p>club id: {id}</p>
-    )
-}
-
-export default ClubAdminPage
+export default ClubAdminPage;

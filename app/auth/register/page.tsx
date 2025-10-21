@@ -17,9 +17,9 @@ export default async function RegisterPage() {
       .single()
 
     if (!club) {
-      redirect("/onboarding/club")
+      redirect("/club/onboarding")
     } else {
-      redirect("/")
+      redirect(`/club/${club.id}/admin`)
     }
   }
 

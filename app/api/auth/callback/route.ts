@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(requestUrl.origin + "/login?error=Unable to verify email")
     }
 
-    // Verificar si el usuario ya tiene un club asociado
     const { data: { user } } = await supabase.auth.getUser()
 
     if (user) {
@@ -27,7 +26,7 @@ export async function GET(request: NextRequest) {
 
       // Si no tiene club, redirigir a onboarding
       if (!clubs) {
-        return NextResponse.redirect(requestUrl.origin + "/onboarding/club")
+        return NextResponse.redirect(requestUrl.origin + "/club/onboarding")
       }
     }
   }

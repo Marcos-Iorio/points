@@ -5,21 +5,21 @@ import { redirect } from "next/navigation"
 export default async function LoginPage() {
   const supabase = await createClient()
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: {user},
+  } = await supabase.auth.getUser()
 
-  if (session) {
+  if (user) {
     // Check if user has a club
     const { data: club } = await supabase
       .from('clubs')
-      .select('id')
-      .eq('auth_user_id', session.user.id)
+      .select('id, name')
+      .eq('auth_user_id', user.id)
       .single()
 
     if (!club) {
-      redirect("/onboarding/club")
+      redirect("/club/onboarding")
     } else {
-      redirect("/")
+      redirect(`/club/${club.id}/admin`)
     }
   }
 
