@@ -9,13 +9,16 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 
 interface AdminSideMenuProps {
-  clubId: string;
+  clubData: {
+    name: string;
+    id: string;
+  };
   userEmail?: string;
   userName?: string;
 }
 
 export function AdminSideMenu({
-  clubId,
+  clubData,
   userEmail,
   userName,
 }: AdminSideMenuProps) {
@@ -31,17 +34,17 @@ export function AdminSideMenu({
 
   const menuItems = [
     {
-      href: `/club/${clubId}/admin`,
+      href: `/club/${clubData.name}/${clubData.id}/admin`,
       label: "Dashboard",
       icon: Home,
     },
     {
-      href: `/club/${clubId}/admin/canchas`,
+      href: `/club/${clubData.id}/admin/canchas`,
       label: "Canchas",
       icon: MapPin,
     },
     {
-      href: `/club/${clubId}/admin/configuracion`,
+      href: `/club/${clubData.id}/admin/configuracion`,
       label: "Configuración",
       icon: Settings,
     },
