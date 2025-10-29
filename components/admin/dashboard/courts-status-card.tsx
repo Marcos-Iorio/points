@@ -16,20 +16,34 @@ interface CourtsStatusCardProps {
 export async function CourtsStatusCard({ clubId }: CourtsStatusCardProps) {
   const supabase = await createClient();
 
-  // Obtener total de kits del club
-  const { data: kits, error: kitsError } = await supabase
-    .from("kits")
-    .select("id, status, court_id")
+  // Obtener total de canchas registradas del club
+  const { data: courts, error: courtsError } = await supabase
+    .from("courts")
+    .select("id, name")
     .eq("club_id", clubId);
 
-  if (kitsError) {
-    console.error("Error fetching kits:", kitsError);
+  if (courtsError) {
+    console.error("Error fetching courts:", courtsError);
   }
 
-  const totalKits = kits?.length || 0;
+  const totalCourts = courts?.length || 0;
 
-  // Si no hay kits, mostrar mensaje de compra
-  if (totalKits === 0) {
+  // Obtener canchas con match activo
+  const { data: activeMatches, error: matchesError } = await supabase
+    .from("court_configurations")
+    .select("court_id")
+    .in("court_id", courts?.map((c) => c.id) || [])
+    .is("match_end", null)
+    .in("match_status", ["playing", "paused"]);
+
+  if (matchesError) {
+    console.error("Error fetching active matches:", matchesError);
+  }
+
+  const courtsInUse = activeMatches?.length || 0;
+  const courtsAvailable = totalCourts - courtsInUse;
+
+  if (totalCourts === 0) {
     return (
       <Card className="bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10">
         <CardContent className="space-y-4">
@@ -52,14 +66,6 @@ export async function CourtsStatusCard({ clubId }: CourtsStatusCardProps) {
     );
   }
 
-  // Calcular canchas en uso (kits asignados a una cancha con status 'active')
-  const courtsInUse =
-    kits?.filter((kit) => kit.court_id !== null && kit.status === "active")
-      .length || 0;
-
-  // Calcular canchas disponibles
-  const courtsAvailable = totalKits - courtsInUse;
-
   return (
     <Card className="bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10">
       <CardHeader>
@@ -71,7 +77,7 @@ export async function CourtsStatusCard({ clubId }: CourtsStatusCardProps) {
           {/* Total de canchas */}
           <div className="flex flex-col items-center justify-center rounded-lg border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-md">
             <div className="mb-2 text-3xl font-bold text-foreground">
-              {totalKits}
+              {totalCourts}
             </div>
             <div className="text-xs text-muted-foreground font-medium text-center">
               Total de Canchas
@@ -104,7 +110,10 @@ export async function CourtsStatusCard({ clubId }: CourtsStatusCardProps) {
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Ocupación</span>
             <span>
-              {totalKits > 0 ? Math.round((courtsInUse / totalKits) * 100) : 0}%
+              {totalCourts > 0
+                ? Math.round((courtsInUse / totalCourts) * 100)
+                : 0}
+              %
             </span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
@@ -112,7 +121,7 @@ export async function CourtsStatusCard({ clubId }: CourtsStatusCardProps) {
               className="h-full bg-gradient-to-r from-chart-1 to-chart-1/80 transition-all duration-500"
               style={{
                 width: `${
-                  totalKits > 0 ? (courtsInUse / totalKits) * 100 : 0
+                  totalCourts > 0 ? (courtsInUse / totalCourts) * 100 : 0
                 }%`,
               }}
             />
