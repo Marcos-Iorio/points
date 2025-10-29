@@ -46,7 +46,7 @@ const ClubOnboardingForm = ({ userId }: ClubOnboardingFormProps) => {
           email: formData.email,
           phone: formData.phone || null,
           address: formData.address || null,
-          status: 'active'
+          status: 'pending'
         })
         .select()
         .single()
@@ -60,7 +60,7 @@ const ClubOnboardingForm = ({ userId }: ClubOnboardingFormProps) => {
 
       if (data) {
         console.log('Club creado exitosamente:', data)
-        router.push('/dashboard')
+        router.push(`/club/${data.id}/${data.name}`)
       }
     } catch (error) {
       setError('Ocurrió un error inesperado')

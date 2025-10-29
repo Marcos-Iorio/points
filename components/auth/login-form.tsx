@@ -6,6 +6,8 @@ import { Button } from "../ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/card"
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from "../ui/field"
 import { Input } from "../ui/input"
+import { redirect, useRouter } from "next/navigation"
+
 
 interface IUserCredential {
     email: string,
@@ -20,6 +22,7 @@ const LoginForm = () => {
     const [error, setError] = useState<string>("")
     const [loading, setLoading] = useState<boolean>(false)
 
+    const router = useRouter()
     const supabase = createClient()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -30,14 +33,16 @@ const LoginForm = () => {
         try {
             const { data, error } = await supabase.auth.signInWithPassword(clientCredentials)
 
-            if (error?.message == "Email not confirmed" ) {
-                console.log(error)
-                setError("Confirmá tu mail para continuar")
+            switch(error?.message) {
+              case "Email not confirmed": setError("Confirmá tu mail para continuar")
                 setLoading(false)
-                return
+                break;
+              case "Invalid login credentials": 
+                setError("Mail o contraseña inválidos")
+                setLoading(false)
+                break;
             }
 
-            // Check if user has a club
             if (data.user) {
                 const { data: club, error: clubError } = await supabase
                     .from('clubs')
@@ -45,15 +50,11 @@ const LoginForm = () => {
                     .eq('auth_user_id', data.user.id)
                     .single()
 
-                // If no club, redirect to onboarding
                 if (!club || clubError) {
-                    window.location.href = "/onboarding/club"
-                    return
+                    redirect("/club/onboarding")
                 }
             }
-
-            // Email is verified and has club, redirect to home
-            window.location.href = "/"
+           router.refresh()
         } catch (error) {
             setError("Ocurrió un error inesperado. Por favor intenta de nuevo.")
             setLoading(false)
@@ -127,7 +128,7 @@ const LoginForm = () => {
               </Field>
               <Field>
                 {error && (
-                  <div className="text-red-600 text-sm text-center mb-2">
+                  <div className="text-red-800 text-sm text-center mb-2 bg-red-100 rounded-2xl p-2 w-fit font-semibold">
                     {error}
                   </div>
                 )}
