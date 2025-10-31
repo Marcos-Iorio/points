@@ -19,8 +19,6 @@ const MatchPage = async ({
     .eq("name", courtNumber)
     .single();
 
-  console.log("courtData:", courtData, "courtError:", courtError);
-
   if (!courtData) {
     notFound();
   }
@@ -33,8 +31,6 @@ const MatchPage = async ({
     .limit(1)
     .single();
 
-  console.log("matchConfig:", matchConfig, "matchError:", matchError);
-
   if (!matchConfig) {
     notFound();
   }
@@ -43,10 +39,14 @@ const MatchPage = async ({
     score?: {
       team1Sets: number;
       team2Sets: number;
+      setsHistory: Array<{ team1Games: number; team2Games: number }>;
       currentSet: {
+        team1Games: number;
+        team2Games: number;
         team1Points: number;
         team2Points: number;
       };
+      server: "team1" | "team2";
     };
   };
 

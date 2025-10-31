@@ -31,9 +31,8 @@ export function MatchConfigForm({
   const [formData, setFormData] = useState({
     team1Name: "",
     team2Name: "",
-    gameMode: "doubles" as "single" | "doubles",
     sets: 3,
-    pointsToWin: 21,
+    goldenPoint: true,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,41 +154,6 @@ export function MatchConfigForm({
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold mb-4">Modo de Juego</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData({ ...formData, gameMode: "single" })
-                  }
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    formData.gameMode === "single"
-                      ? "border-primary bg-primary/10"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <div className="font-semibold">Individual</div>
-                  <div className="text-sm text-gray-600">1 vs 1</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData({ ...formData, gameMode: "doubles" })
-                  }
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    formData.gameMode === "doubles"
-                      ? "border-primary bg-primary/10"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <div className="font-semibold">Dobles</div>
-                  <div className="text-sm text-gray-600">2 vs 2</div>
-                </button>
-              </div>
-            </div>
-
-            <div>
               <h2 className="text-xl font-semibold mb-4">
                 Configuración del Partido
               </h2>
@@ -219,28 +183,40 @@ export function MatchConfigForm({
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="points"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Puntos para ganar set
+                  <label className="block text-sm font-medium mb-2">
+                    Punto de Oro
                   </label>
-                  <select
-                    id="points"
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    value={formData.pointsToWin}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pointsToWin: parseInt(e.target.value),
-                      })
-                    }
-                  >
-                    <option value={11}>11 puntos</option>
-                    <option value={15}>15 puntos</option>
-                    <option value={21}>21 puntos</option>
-                    <option value={25}>25 puntos</option>
-                  </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData({ ...formData, goldenPoint: true })
+                      }
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        formData.goldenPoint
+                          ? "border-primary bg-primary/10"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      <div className="font-semibold">Con Punto de Oro</div>
+                      <div className="text-sm text-gray-600">40-40 → punto decisivo</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData({ ...formData, goldenPoint: false })
+                      }
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        !formData.goldenPoint
+                          ? "border-primary bg-primary/10"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      <div className="font-semibold">Sin Punto de Oro</div>
+                      <div className="text-sm text-gray-600">Ventaja tradicional</div>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

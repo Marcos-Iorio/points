@@ -6,9 +6,8 @@ import { revalidatePath } from "next/cache";
 export type MatchConfiguration = {
   team1Name: string;
   team2Name: string;
-  gameMode: "single" | "doubles";
   sets: number;
-  pointsToWin: number;
+  goldenPoint: boolean;
 };
 
 export async function createMatchConfiguration(
@@ -61,10 +60,14 @@ export async function updateMatchScore(
   score: {
     team1Sets: number;
     team2Sets: number;
+    setsHistory: Array<{ team1Games: number; team2Games: number }>;
     currentSet: {
+      team1Games: number;
+      team2Games: number;
       team1Points: number;
       team2Points: number;
     };
+    server: "team1" | "team2";
   }
 ) {
   const supabase = await createClient();
@@ -80,7 +83,7 @@ export async function updateMatchScore(
   }
 
   const updatedConfig = {
-    ...currentConfig,
+    ...(currentConfig.configuration as any),
     score,
   };
 
@@ -98,5 +101,27 @@ export async function updateMatchScore(
     throw new Error("Failed to update match score");
   }
 
+  return data;
+}
+
+export async function endMatch(configId: string, winner?: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("court_configurations")
+    .update({
+      match_status: "completed",
+      match_end: new Date().toISOString(),
+    })
+    .eq("id", configId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error ending match:", error);
+    throw new Error("Failed to end match");
+  }
+
+  revalidatePath(`/match`);
   return data;
 }
