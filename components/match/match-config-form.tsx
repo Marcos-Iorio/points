@@ -1,10 +1,13 @@
 "use client";
-
+import { gsap } from "gsap/gsap-core";
+import { useGSAP } from "@gsap/react";
+import { stepsAnimation } from "@/utils/animations/wizard-steps";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createMatchConfiguration } from "@/app/actions/match";
+import Wizard from "../wizard";
 
 interface MatchConfigFormProps {
   courtId: string;
@@ -54,11 +57,20 @@ export function MatchConfigForm({
     return <h2>¡A jugar!</h2>;
   }
 
-  // Si hay un partido activo, mostrar mensaje
+  useGSAP(() => {
+    const timer = setTimeout(() => {
+      stepsAnimation();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   if (activeMatch) {
-    const teamNames = activeMatch.configuration?.team1Name && activeMatch.configuration?.team2Name
-      ? `${activeMatch.configuration.team1Name} vs ${activeMatch.configuration.team2Name}`
-      : "Partido en curso";
+    const teamNames =
+      activeMatch.configuration?.team1Name &&
+      activeMatch.configuration?.team2Name
+        ? `${activeMatch.configuration.team1Name} vs ${activeMatch.configuration.team2Name}`
+        : "Partido en curso";
 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -77,15 +89,21 @@ export function MatchConfigForm({
               </p>
               {activeMatch.match_start && (
                 <p className="text-sm text-text-secondary">
-                  Partido iniciado: {new Date(activeMatch.match_start).toLocaleTimeString('es-AR', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
+                  Partido iniciado:{" "}
+                  {new Date(activeMatch.match_start).toLocaleTimeString(
+                    "es-AR",
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
                 </p>
               )}
             </div>
             <Button
-              onClick={() => router.push(`/${clubName}/${clubId}/court/${courtNumber}/match`)}
+              onClick={() =>
+                router.push(`/${clubName}/${clubId}/court/${courtNumber}/match`)
+              }
               className="w-full h-12 text-lg"
             >
               Ver Partido en Vivo
@@ -109,126 +127,10 @@ export function MatchConfigForm({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-card p-6 rounded-lg shadow-sm border space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Equipos</h2>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="team1"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Nombre del Equipo 1
-                  </label>
-                  <Input
-                    id="team1"
-                    type="text"
-                    placeholder="Ej: Los Tigres"
-                    required
-                    value={formData.team1Name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, team1Name: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="team2"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Nombre del Equipo 2
-                  </label>
-                  <Input
-                    id="team2"
-                    type="text"
-                    placeholder="Ej: Las Águilas"
-                    required
-                    value={formData.team2Name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, team2Name: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-semibold mb-4">
-                Configuración del Partido
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="sets"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Cantidad de Sets (mejor de)
-                  </label>
-                  <select
-                    id="sets"
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    value={formData.sets}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        sets: parseInt(e.target.value),
-                      })
-                    }
-                  >
-                    <option value={1}>1 Set</option>
-                    <option value={3}>Mejor de 3</option>
-                    <option value={5}>Mejor de 5</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Punto de Oro
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, goldenPoint: true })
-                      }
-                      className={`p-4 rounded-lg border-2 transition-all ${
-                        formData.goldenPoint
-                          ? "border-primary bg-primary/10"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      <div className="font-semibold">Con Punto de Oro</div>
-                      <div className="text-sm text-gray-600">40-40 → punto decisivo</div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, goldenPoint: false })
-                      }
-                      className={`p-4 rounded-lg border-2 transition-all ${
-                        !formData.goldenPoint
-                          ? "border-primary bg-primary/10"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      <div className="font-semibold">Sin Punto de Oro</div>
-                      <div className="text-sm text-gray-600">Ventaja tradicional</div>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full h-12 text-lg"
-            disabled={loading}
-          >
-            {loading ? "Creando partido..." : "Comenzar Partido"}
-          </Button>
+          <Wizard>
+            <p id="step">Cancha</p>
+            <p id="step">Partido</p>
+          </Wizard>
         </form>
       </div>
     </div>
