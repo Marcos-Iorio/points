@@ -3,13 +3,15 @@ import { useGSAP } from "@gsap/react";
 import { ScrollSmoother, ScrollTrigger } from "@/plugins";
 
 export const stepsAnimation = () => {
-  useGSAP(() => {
-    if (typeof window === "undefined") return;
+  const steps = document.querySelectorAll("#step");
+
+  steps.forEach((step) => {
     const tl = gsap
       .timeline({
-        paused: true,
+        paused: false,
         defaults: { duration: 1 },
       })
-      .to("#step", { opacity: 0 });
+      .from(step, { x: 100 })
+      .to(step, { x: 0 });
   });
 };
