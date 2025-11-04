@@ -12,6 +12,7 @@ import { Button } from "./ui/button";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Progress } from "@/components/ui/progress";
+import { ChevronLeft } from "lucide-react";
 
 const NextPage = ({
   nextPage,
@@ -52,10 +53,9 @@ const BackPage = ({
       disabled={activePage === 0 || disabled}
       onClick={backPage}
       type="button"
-      variant="outline"
-      className="w-full h-12 text-lg"
+      className="w-10 h-10"
     >
-      Paso anterior
+      <ChevronLeft />
     </Button>
   );
 };
@@ -151,17 +151,7 @@ const Wizard = ({ children }: PropsWithChildren) => {
 
   return (
     <div className="space-y-6">
-      <Progress
-        value={33 * activePageIndex == 99 ? 100 : 33 * activePageIndex}
-        className="bg-surface"
-        color="white"
-      />
-      <div ref={stepRef} className="min-h-[400px]">
-        {currentPage}
-      </div>
-
-      {/* Navigation buttons */}
-      <div className="flex gap-4 pt-6">
+      <div className="flex flex-row justify-center items-center gap-5">
         {activePageIndex !== 0 && (
           <BackPage
             backPage={handleBack}
@@ -169,6 +159,19 @@ const Wizard = ({ children }: PropsWithChildren) => {
             disabled={isAnimating}
           />
         )}
+        <Progress
+          value={33 * activePageIndex == 99 ? 100 : 33 * activePageIndex}
+          className="bg-surface"
+          color="white"
+        />
+      </div>
+
+      <div ref={stepRef} className="min-h-[400px]">
+        {currentPage}
+      </div>
+
+      {/* Navigation buttons */}
+      <div className="flex gap-4 pt-6">
         <NextPage
           nextPage={handleNext}
           activePage={activePageIndex}
