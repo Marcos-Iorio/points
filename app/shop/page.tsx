@@ -14,7 +14,7 @@ const ShopPage = async () => {
   }
 
   return (
-    <div className="w-[90%] m-auto flex-1 flex flex-row gap-4">
+    <div className="w-[90%] m-auto flex-1 flex flex-row gap-5">
       <Product product={product?.[0]} />
     </div>
   );

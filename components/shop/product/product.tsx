@@ -3,15 +3,17 @@
 import React from "react";
 import AddToCartButton from "./add-to-cart-button";
 import { ProductType } from "@/types/product";
+import Images from "./images";
 
 export interface ProductProps {
   product: ProductType;
 }
 
 const Product = ({ product }: ProductProps) => {
+  console.log(product.images);
   return (
     <>
-      <div className="bg-surface border border-soft rounded-lg w-3/5 p-8"></div>
+      <Images images={product.images || {}} />
       <div className="bg-surface border border-soft rounded-lg w-2/5 p-8 flex flex-col gap-8">
         <h2 className="text-5xl text-text-primary font-bold">{product.name}</h2>
         <div
