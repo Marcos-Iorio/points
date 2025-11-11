@@ -67,9 +67,13 @@ const Navbar = () => {
     <header className=" mx-auto w-[90%] rounded-lg flex justify-between gap-2">
       <Link
         href="/"
-        className="border border-soft rounded-lg bg-surface flex justify-center items-center px-4 py-2"
+        className="border border-soft rounded-lg bg-surface flex justify-center items-center px-4 py-2 w-22 h-auto hover:bg-hover-light"
       >
-        <img src={null} alt="points logo" />
+        <img
+          src={"/points-logo.png"}
+          alt="points logo"
+          className="w-full h-full"
+        />
       </Link>
       <div className="bg-surface backdrop-blur-2xl border border-soft flex gap-2 justify-between w-full rounded-lg px-4 py-2">
         <div></div>
