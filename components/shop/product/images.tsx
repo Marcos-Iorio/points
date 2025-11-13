@@ -5,6 +5,7 @@ import { IImages, ProductType } from "@/types/product";
 import Dots from "@/components/ui/dots";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CustomMouse from "./custom-mouse";
+import TranslateEffect from "@/components/ui/translate-effect";
 
 type ImagesProps = Pick<ProductType, "images">;
 
@@ -18,8 +19,7 @@ const Images = ({ images }: ImagesProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const heightOfImage = 60;
-  const gap = 8;
-  const translateY = activeImage * (heightOfImage + gap);
+  const gap = 20;
 
   if (!images || images.length === 0) {
     return <div>No hay imágenes disponibles</div>;
@@ -56,19 +56,19 @@ const Images = ({ images }: ImagesProps) => {
   return (
     <section className="flex flex-col h-full w-3/5 gap-5 justify-center items-center">
       <div className="flex flex-row gap-5 h-full justify-start w-full">
-        <div className="flex flex-col gap-2 relative">
+        <div className="flex flex-col gap-5 relative max-w-22 w-full">
+          <TranslateEffect
+            isVertical={true}
+            active={activeImage}
+            height={heightOfImage}
+            gap={gap}
+            className={`absolute top-0 left-0 max-h-17 h-full w-full border-2 border-accent-secondary rounded-sm bg-black/30 transition-all duration-300 z-10 `}
+          />
           {images.map((image, index) => (
             <>
               <div
-                style={{ transform: `translateY(${translateY}px)` }}
-                className={`w-0.5 h-10 rounded-full bg-black/70 absolute top-2.5 -left-2 transition-all duration-300 z-10 `}
-              />
-              <div
                 key={image.id}
-                className={`max-w-22 h-15 justify-start items-start cursor-pointer relative select-none transition-all duration-100 ${
-                  activeImage === index &&
-                  "after:absolute after:content-[''] after:top-0 after:left-0 after:h-full after:w-full after:bg-black/30 after:rounded-sm"
-                }`}
+                className={`w-full max-h-15 h-full justify-start items-start cursor-pointer relative select-none transition-all duration-100 `}
                 onClick={() => setActiveImage(index)}
               >
                 <img

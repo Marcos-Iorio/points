@@ -36,8 +36,6 @@ const CustomMouse = ({ containerRef, imageRef }: CustomMouseProps) => {
         target.closest("button") !== null ||
         target.classList.contains("cursor-pointer");
 
-      console.log(isOverButton);
-
       setIsInsideContainer(isInside && !isOverButton);
 
       if (isInside && !isOverButton) {
@@ -63,7 +61,6 @@ const CustomMouse = ({ containerRef, imageRef }: CustomMouseProps) => {
     };
   }, [containerRef, imageRef]);
 
-  // Actualizar src cuando cambia la imagen
   useEffect(() => {
     const image = imageRef.current;
     if (image) {
