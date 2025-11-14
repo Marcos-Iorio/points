@@ -34,7 +34,7 @@ const Images = ({ images }: ImagesProps) => {
           setActiveImage((prev) => (prev > 0 ? prev - 1 : images.length - 1))
         }
       >
-        <ChevronLeft />
+        <ChevronLeft className="text-white" />
       </button>
     );
   };
@@ -43,12 +43,12 @@ const Images = ({ images }: ImagesProps) => {
     return (
       <button
         role="button"
-        className="bg-black/20 h-10 w-10 flex justify-center items-center rounded-lg cursor-pointer hover:bg-black/30 z-10"
+        className="bg-black/20  h-10 w-10 flex justify-center items-center rounded-lg cursor-pointer hover:bg-black/30 z-10"
         onClick={() =>
           setActiveImage((prev) => (prev < images.length - 1 ? prev + 1 : 0))
         }
       >
-        <ChevronRight />
+        <ChevronRight className="text-white" />
       </button>
     );
   };
@@ -56,7 +56,7 @@ const Images = ({ images }: ImagesProps) => {
   return (
     <section className="flex flex-col h-full w-3/5 gap-5 justify-center items-center">
       <div className="flex flex-row gap-5 h-full justify-start w-full">
-        <div className="flex flex-col gap-5 relative max-w-22 w-full">
+        <div className="flex flex-col gap-5 relative max-w-22 w-full select-none">
           <TranslateEffect
             isVertical={true}
             active={activeImage}
@@ -65,19 +65,18 @@ const Images = ({ images }: ImagesProps) => {
             className={`absolute top-0 left-0 max-h-17 h-full w-full border-2 border-accent-secondary rounded-sm bg-black/30 transition-all duration-300 z-10 `}
           />
           {images.map((image, index) => (
-            <>
+            <React.Fragment key={image.id}>
               <div
-                key={image.id}
                 className={`w-full max-h-15 h-full justify-start items-start cursor-pointer relative select-none transition-all duration-100 `}
                 onClick={() => setActiveImage(index)}
               >
                 <img
                   src={getPublicImageUrl(image.image_url)}
                   alt="rest-of-images"
-                  className="w-full h-auto object-contain rounded-sm"
+                  className="w-full h-auto object-contain rounded-sm select-none"
                 />
               </div>
-            </>
+            </React.Fragment>
           ))}
         </div>
         <div className="w-full relative" ref={imageContainerRef}>
@@ -90,7 +89,7 @@ const Images = ({ images }: ImagesProps) => {
             ref={imageRef}
             src={getPublicImageUrl(images[activeImage].image_url)}
             alt={"active-image"}
-            className="w-full rounded-lg z-0 cursor-none"
+            className="w-full rounded-lg z-0 cursor-none select-none"
           />
         </div>
       </div>

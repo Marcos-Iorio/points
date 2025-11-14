@@ -13,13 +13,32 @@ const CustomMouse = ({ containerRef, imageRef }: CustomMouseProps) => {
   const [isInsideContainer, setIsInsideContainer] = useState(false);
   const [imageSrc, setImageSrc] = useState("");
 
+  // Actualizar imageSrc cuando la imagen cambia
+  useEffect(() => {
+    const image = imageRef.current;
+    if (image) {
+      setImageSrc(image.src);
+
+      // Listener para detectar cuando cambia el src
+      const observer = new MutationObserver(() => {
+        if (image.src) {
+          setImageSrc(image.src);
+        }
+      });
+
+      observer.observe(image, {
+        attributes: true,
+        attributeFilter: ["src"],
+      });
+
+      return () => observer.disconnect();
+    }
+  }, [imageRef]);
+
   useEffect(() => {
     const container = containerRef.current;
     const image = imageRef.current;
     if (!container || !image) return;
-
-    // Obtener la URL de la imagen
-    setImageSrc(image.src);
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
@@ -41,6 +60,10 @@ const CustomMouse = ({ containerRef, imageRef }: CustomMouseProps) => {
       if (isInside && !isOverButton) {
         setMousePosition({ x: e.clientX, y: e.clientY });
 
+        if (image.src !== imageSrc) {
+          setImageSrc(image.src);
+        }
+
         // Calcular posición relativa (0 a 1)
         const relX = (e.clientX - rect.left) / rect.width;
         const relY = (e.clientY - rect.top) / rect.height;
@@ -59,14 +82,7 @@ const CustomMouse = ({ containerRef, imageRef }: CustomMouseProps) => {
       window.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [containerRef, imageRef]);
-
-  useEffect(() => {
-    const image = imageRef.current;
-    if (image) {
-      setImageSrc(image.src);
-    }
-  }, [imageRef.current?.src]);
+  }, [containerRef, imageRef, imageSrc]);
 
   if (!isInsideContainer) return null;
 

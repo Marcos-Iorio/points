@@ -10,16 +10,19 @@ interface PlanGuardProps {
 export async function PlanGuard({ clubId, children }: PlanGuardProps) {
   const supabase = await createClient();
 
-  const { data: supportPlan } = await supabase
-    .from("support_plans")
-    .select("plan_type, status")
+  const { data: subscription } = await supabase
+    .from("club_subscriptions")
+    .select(`
+      *,
+      plan:plans(*)
+    `)
     .eq("club_id", clubId)
     .maybeSingle();
 
   const hasActivePlan =
-    supportPlan &&
-    supportPlan.status === "active" &&
-    supportPlan.plan_type !== "pending";
+    subscription &&
+    subscription.status === "active" &&
+    subscription.plan?.active === true;
 
   if (hasActivePlan) {
     return <>{children}</>;
@@ -56,9 +59,9 @@ export async function PlanGuard({ clubId, children }: PlanGuardProps) {
               Plan de Soporte Requerido
             </h2>
             <p className="text-lg text-muted-foreground">
-              {!supportPlan
+              {!subscription
                 ? "No tienes un plan de soporte activo"
-                : supportPlan.plan_type === "pending"
+                : subscription.status === "pending"
                 ? "Tu plan está pendiente de activación"
                 : "Tu plan está inactivo"}
             </p>
