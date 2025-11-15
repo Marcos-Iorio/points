@@ -3,6 +3,7 @@
 import React, { ReactNode } from "react";
 
 // @param isVertical determine if the translate effect is on X axis or Y axis default is false
+// @param itemRefs optional array of refs to calculate dynamic widths/heights
 
 interface ITranslateEffect {
   gap?: number;
@@ -11,6 +12,7 @@ interface ITranslateEffect {
   isVertical: boolean;
   className: string;
   active: number;
+  itemRefs?: (HTMLElement | null)[];
 }
 
 const TranslateEffect = ({
@@ -20,9 +22,31 @@ const TranslateEffect = ({
   isVertical = false,
   active,
   className,
+  itemRefs,
 }: ITranslateEffect) => {
-  const translateX = active * (width + gap);
-  const translateY = active * (height + gap);
+  let translateX = active * (width + gap);
+  let translateY = active * (height + gap);
+
+  // Si se proveen refs, calcular el desplazamiento sumando los anchos/altos reales
+  if (itemRefs && itemRefs.length > 0) {
+    if (isVertical) {
+      translateY = 0;
+      for (let i = 0; i < active && i < itemRefs.length; i++) {
+        const element = itemRefs[i];
+        if (element) {
+          translateY += element.offsetHeight + gap;
+        }
+      }
+    } else {
+      translateX = 0;
+      for (let i = 0; i < active && i < itemRefs.length; i++) {
+        const element = itemRefs[i];
+        if (element) {
+          translateX += element.offsetWidth + gap;
+        }
+      }
+    }
+  }
 
   const translate = isVertical
     ? `translateY(${translateY}px)`

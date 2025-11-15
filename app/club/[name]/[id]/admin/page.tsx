@@ -2,6 +2,7 @@ import React from "react";
 import { AdminSideMenu } from "@/components/admin/admin-side-menu";
 import { CourtsStatusCard } from "@/components/admin/dashboard/courts-status-card";
 import { requireClubOwner } from "@/lib/auth";
+import { PlanUsageCard } from "@/components/admin/dashboard/plan-usage-card";
 
 const ClubAdminPage = async ({
   params,
@@ -27,6 +28,7 @@ const ClubAdminPage = async ({
             Bienvenido al panel de administración de {club.name}
           </p>
           <CourtsStatusCard clubId={club.id} />
+          <PlanUsageCard clubId={club.id} />
         </section>
       </main>
     </div>

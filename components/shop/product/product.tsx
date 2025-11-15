@@ -10,7 +10,6 @@ export interface ProductProps {
 }
 
 const Product = ({ product }: ProductProps) => {
-  console.log(product.images);
   return (
     <>
       <Images images={product.images || {}} />

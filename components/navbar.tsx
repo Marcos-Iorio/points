@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { ShoppingCart } from "lucide-react";
 import useCart from "@/hooks/useCart";
+import TranslateEffect from "./ui/translate-effect";
 
 type Club = {
   id: string;
@@ -18,6 +19,8 @@ const Navbar = () => {
   const pathName = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [club, setClub] = useState<Club | null>(null);
+  const [activeNav, setActiveNav] = useState(0);
+  const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const supabase = createClient();
 
   const { cartItems } = useCart();
@@ -36,6 +39,7 @@ const Navbar = () => {
       item: "Planes",
       link: "/plans",
     },
+    { item: "Inicio", link: "/" },
   ];
 
   useEffect(() => {
@@ -59,6 +63,14 @@ const Navbar = () => {
     getUser();
   }, []);
 
+  useEffect(() => {
+    const activeIndex = navItems.findIndex((item) => item.link === pathName);
+    console.log(activeIndex, pathName);
+    if (activeIndex !== -1) {
+      setActiveNav(activeIndex);
+    }
+  }, [pathName]);
+
   if (pathName.includes("/club")) {
     return null;
   }
@@ -77,16 +89,26 @@ const Navbar = () => {
       </Link>
       <div className="bg-surface backdrop-blur-2xl border border-soft flex gap-2 justify-between w-full rounded-lg px-4 py-2">
         <div></div>
-        <nav className="flex gap-2 justify-center items-center space-x-2">
+        <nav className="flex gap-2 justify-center items-center space-x-2 relative">
           {navItems.reverse().map((item, i) => (
             <Link
               key={i}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
               href={item.link}
-              className="text-primary lowercase text-lg"
+              className="text-primary lowercase text-lg z-10"
             >
               {item.item}
             </Link>
           ))}
+          <TranslateEffect
+            active={activeNav}
+            itemRefs={itemRefs.current}
+            gap={8}
+            isVertical={false}
+            className="absolute left-0 top-0 h-full bg-black/30 rounded-md transition-all duration-300 ease-in-out"
+          />
         </nav>
         {user && club && (
           <p className="flex justi-center items-center">{club.name}</p>

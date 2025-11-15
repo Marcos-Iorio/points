@@ -48,7 +48,7 @@ ALTER TABLE club_subscriptions ADD COLUMN plan_id UUID REFERENCES plans(id);
 UPDATE club_subscriptions cs
 SET plan_id = p.id
 FROM plans p
-WHERE cs.plan_type = p.plan_type;
+WHERE cs.plan_type::TEXT = p.plan_type;
 
 -- 5. Hacer plan_id obligatorio ahora que los datos están migrados
 ALTER TABLE club_subscriptions ALTER COLUMN plan_id SET NOT NULL;
@@ -99,7 +99,7 @@ ON club_subscriptions FOR SELECT
 TO authenticated
 USING (
   club_id IN (
-    SELECT id FROM clubs WHERE owner_id = auth.uid()
+    SELECT id FROM clubs WHERE auth_user_id = auth.uid()
   )
 );
 
@@ -110,12 +110,12 @@ ON club_subscriptions FOR ALL
 TO authenticated
 USING (
   club_id IN (
-    SELECT id FROM clubs WHERE owner_id = auth.uid()
+    SELECT id FROM clubs WHERE auth_user_id = auth.uid()
   )
 )
 WITH CHECK (
   club_id IN (
-    SELECT id FROM clubs WHERE owner_id = auth.uid()
+    SELECT id FROM clubs WHERE auth_user_id = auth.uid()
   )
 );
 
