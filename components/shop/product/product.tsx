@@ -1,15 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import AddToCartButton from "./add-to-cart-button";
 import { ProductType } from "@/types/product";
 import Images from "./images";
+import SelectPlan from "./select-plan";
+import { Plan } from "@/types/subscription";
 
 export interface ProductProps {
   product: ProductType;
 }
 
 const Product = ({ product }: ProductProps) => {
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
   return (
     <>
       <Images images={product.images || {}} />
@@ -19,6 +23,7 @@ const Product = ({ product }: ProductProps) => {
           className="text-lg text-text-secondary"
           dangerouslySetInnerHTML={{ __html: product.description }}
         />
+        <SelectPlan setSelectedPlan={setSelectedPlan} />
         <AddToCartButton product={product} />
       </div>
     </>

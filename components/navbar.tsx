@@ -26,7 +26,7 @@ const Navbar = () => {
   const { cartItems } = useCart();
 
   const navItems = [
-    { item: "Comprá", link: "/shop" },
+    { item: "Inicio", link: "/" },
     {
       item: "Acerca de",
       link: "",
@@ -39,7 +39,7 @@ const Navbar = () => {
       item: "Planes",
       link: "/plans",
     },
-    { item: "Inicio", link: "/" },
+    { item: "Comprá", link: "/shop" },
   ];
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const activeIndex = navItems.findIndex((item) => item.link === pathName);
-    console.log(activeIndex, pathName);
+
     if (activeIndex !== -1) {
       setActiveNav(activeIndex);
     }
@@ -90,7 +90,7 @@ const Navbar = () => {
       <div className="bg-surface backdrop-blur-2xl border border-soft flex gap-2 justify-between w-full rounded-lg px-4 py-2">
         <div></div>
         <nav className="flex gap-2 justify-center items-center space-x-2 relative">
-          {navItems.reverse().map((item, i) => (
+          {navItems.map((item, i) => (
             <Link
               key={i}
               ref={(el) => {
@@ -104,8 +104,6 @@ const Navbar = () => {
           ))}
           <TranslateEffect
             active={activeNav}
-            itemRefs={itemRefs.current}
-            gap={8}
             isVertical={false}
             className="absolute left-0 top-0 h-full bg-black/30 rounded-md transition-all duration-300 ease-in-out"
           />
