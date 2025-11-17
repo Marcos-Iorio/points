@@ -11,6 +11,10 @@ export interface ProductProps {
   product: ProductType;
 }
 
+export interface AddToCartButtonProps extends ProductProps {
+  disabled: boolean;
+}
+
 const Product = ({ product }: ProductProps) => {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
@@ -23,8 +27,11 @@ const Product = ({ product }: ProductProps) => {
           className="text-lg text-text-secondary"
           dangerouslySetInnerHTML={{ __html: product.description }}
         />
-        <SelectPlan setSelectedPlan={setSelectedPlan} />
-        <AddToCartButton product={product} />
+        <SelectPlan
+          setSelectedPlan={setSelectedPlan}
+          selectedPlan={selectedPlan}
+        />
+        <AddToCartButton product={product} disabled={selectedPlan == null} />
       </div>
     </>
   );

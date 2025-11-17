@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import React from "react";
-import { ProductProps } from "./product";
+import { AddToCartButtonProps, ProductProps } from "./product";
 import useCart from "@/hooks/useCart";
 
-const AddToCartButton = ({ product }: ProductProps) => {
+const AddToCartButton = ({ product, disabled }: AddToCartButtonProps) => {
   const [quantity, setQuantity] = useState<number>(0);
 
   const { addToCart } = useCart();
@@ -56,7 +56,7 @@ const AddToCartButton = ({ product }: ProductProps) => {
       </div>
       <Button
         onClick={sendToCart}
-        disabled={quantity === 0}
+        disabled={quantity === 0 || disabled}
         className="h-full flex-3/4 rounded-lg text-xl"
       >
         Agregar al carrito
