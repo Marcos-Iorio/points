@@ -7,9 +7,14 @@ import { createClient } from "@/lib/supabase/client";
 interface SelectPlanProps {
   setSelectedPlan: Dispatch<SetStateAction<Plan | null>>;
   selectedPlan: Plan | null;
+  error?: string | null;
 }
 
-const SelectPlan = ({ setSelectedPlan, selectedPlan }: SelectPlanProps) => {
+const SelectPlan = ({
+  setSelectedPlan,
+  selectedPlan,
+  error,
+}: SelectPlanProps) => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -36,13 +41,22 @@ const SelectPlan = ({ setSelectedPlan, selectedPlan }: SelectPlanProps) => {
       <h2 className="font-bold text-2xl">
         Elegí el plan de soporte que más te convenga
       </h2>
-      <div className="flex flex-row justify-center gap-3">
+      {error && (
+        <p className="text-red-500 text-sm font-medium text-center animate-pulse">
+          {error}
+        </p>
+      )}
+      <div
+        className={`flex flex-row justify-center gap-3 ${
+          error ? "ring-2 ring-red-500 rounded-xl p-1 animate-shake" : ""
+        }`}
+      >
         {plans.map((plan: Plan) => (
           <article
             key={plan.id}
             onClick={() => setSelectedPlan(plan)}
-            className={`cursor-pointer w-1/2 text-center  rounded-xl p-5 text-text-primary relative shadow-soft ${
-              selectedPlan?.name === plan.name ? "bg-accent-secondary/40" : null
+            className={`cursor-pointer w-1/2 text-center  rounded-xl p-5 text-text-primary relative shadow-soft transition-all ${
+              selectedPlan?.name === plan.name ? "bg-accent-secondary/40" : ""
             }`}
           >
             <p className="text-lg font-bold">{plan.name}</p>

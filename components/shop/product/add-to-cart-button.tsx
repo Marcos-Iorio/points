@@ -6,13 +6,19 @@ import React from "react";
 import { AddToCartButtonProps, ProductProps } from "./product";
 import useCart from "@/hooks/useCart";
 
-const AddToCartButton = ({ product, disabled }: AddToCartButtonProps) => {
+const AddToCartButton = ({
+  product,
+  disabled,
+  onAddToCart,
+}: AddToCartButtonProps) => {
   const [quantity, setQuantity] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
 
   const { addToCart } = useCart();
 
   const addQuantity = () => {
     setQuantity((prev) => prev + 1);
+    setError(null);
   };
 
   const substrackQuantity = () => {
@@ -20,11 +26,18 @@ const AddToCartButton = ({ product, disabled }: AddToCartButtonProps) => {
       return;
     }
     setQuantity((prev) => prev - 1);
+    setError(null);
   };
 
   const sendToCart = () => {
     if (quantity === 0) {
-      /* error?.set({ type: "quantity", message: "Seleccioná una cantidad" }); */
+      setError("Seleccioná una cantidad antes de agregar al carrito");
+      return;
+    }
+
+    // Validar con el padre (chequea plan)
+    const isValid = onAddToCart();
+    if (!isValid) {
       return;
     }
 
@@ -34,34 +47,40 @@ const AddToCartButton = ({ product, disabled }: AddToCartButtonProps) => {
     };
 
     addToCart(newItem);
+    setError(null);
   };
 
   return (
-    <div className="flex flex-row mt-auto justify-center w-full gap-8 h-14">
-      <div className="flex justify-center gap-1 items-center  p-0 m-0 flex-1/4">
-        <button
-          onClick={addQuantity}
-          className="text-lg font-bold bg-hover-light hover:bg-border rounded-lg p-2 w-12 h-10 cursor-pointer flex-1 flex justify-center"
+    <div className="flex flex-col mt-auto justify-center w-full gap-2">
+      {error && (
+        <p className="text-red-500 text-sm font-medium text-center">{error}</p>
+      )}
+      <div className="flex flex-row justify-center w-full gap-8 h-14">
+        <div className="flex justify-center gap-1 items-center  p-0 m-0 flex-1/4">
+          <button
+            onClick={addQuantity}
+            className="text-lg font-bold bg-hover-light hover:bg-border rounded-lg p-2 w-12 h-10 cursor-pointer flex-1 flex justify-center"
+          >
+            <Plus className="w-5 h-auto" />
+          </button>
+          <p className="text-lg p-2 font-bold text-center bg-hover-light w-12 h-10 rounded-lg grid content-center">
+            {quantity}
+          </p>
+          <button
+            onClick={substrackQuantity}
+            className="text-lg font-bold bg-hover-light hover:bg-border rounded-lg p-2 w-12 h-10 cursor-pointer flex-1  flex justify-center"
+          >
+            <Minus className="w-5 h-auto" />
+          </button>
+        </div>
+        <Button
+          onClick={sendToCart}
+          disabled={false}
+          className="h-full flex-3/4 rounded-lg text-xl"
         >
-          <Plus className="w-5 h-auto" />
-        </button>
-        <p className="text-lg p-2 font-bold text-center bg-hover-light w-12 h-10 rounded-lg grid content-center">
-          {quantity}
-        </p>
-        <button
-          onClick={substrackQuantity}
-          className="text-lg font-bold bg-hover-light hover:bg-border rounded-lg p-2 w-12 h-10 cursor-pointer flex-1  flex justify-center"
-        >
-          <Minus className="w-5 h-auto" />
-        </button>
+          Agregar al carrito
+        </Button>
       </div>
-      <Button
-        onClick={sendToCart}
-        disabled={quantity === 0 || disabled}
-        className="h-full flex-3/4 rounded-lg text-xl"
-      >
-        Agregar al carrito
-      </Button>
     </div>
   );
 };

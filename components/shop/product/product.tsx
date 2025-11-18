@@ -12,18 +12,32 @@ export interface ProductProps {
 }
 
 export interface IError {
-  type: string;
+  type: "quantity" | "plan";
   message: string;
 }
 
 export interface AddToCartButtonProps extends ProductProps {
   disabled: boolean;
-  /*  error: IError | null; */
+  onAddToCart: () => boolean;
 }
 
 const Product = ({ product }: ProductProps) => {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [error, setError] = useState<IError | null>(null);
+
+  const handleSetSelectedPlan = (plan: React.SetStateAction<Plan | null>) => {
+    setSelectedPlan(plan);
+    setError(null);
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedPlan) {
+      setError({ type: "plan", message: "Seleccioná un plan antes de agregar al carrito" });
+      return false;
+    }
+    setError(null);
+    return true;
+  };
 
   return (
     <>
@@ -35,13 +49,14 @@ const Product = ({ product }: ProductProps) => {
           dangerouslySetInnerHTML={{ __html: product.description }}
         />
         <SelectPlan
-          setSelectedPlan={setSelectedPlan}
+          setSelectedPlan={handleSetSelectedPlan}
           selectedPlan={selectedPlan}
+          error={error?.type === "plan" ? error.message : null}
         />
         <AddToCartButton
           product={product}
           disabled={selectedPlan == null}
-          /* error={{ message: error, set: setError }} */
+          onAddToCart={handleAddToCart}
         />
       </div>
     </>
