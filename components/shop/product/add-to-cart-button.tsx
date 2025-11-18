@@ -24,6 +24,7 @@ const AddToCartButton = ({ product, disabled }: AddToCartButtonProps) => {
 
   const sendToCart = () => {
     if (quantity === 0) {
+      /* error?.set({ type: "quantity", message: "Seleccioná una cantidad" }); */
       return;
     }
 

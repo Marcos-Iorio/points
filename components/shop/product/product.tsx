@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import AddToCartButton from "./add-to-cart-button";
 import { ProductType } from "@/types/product";
 import Images from "./images";
@@ -11,12 +11,19 @@ export interface ProductProps {
   product: ProductType;
 }
 
+export interface IError {
+  type: string;
+  message: string;
+}
+
 export interface AddToCartButtonProps extends ProductProps {
   disabled: boolean;
+  /*  error: IError | null; */
 }
 
 const Product = ({ product }: ProductProps) => {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [error, setError] = useState<IError | null>(null);
 
   return (
     <>
@@ -31,7 +38,11 @@ const Product = ({ product }: ProductProps) => {
           setSelectedPlan={setSelectedPlan}
           selectedPlan={selectedPlan}
         />
-        <AddToCartButton product={product} disabled={selectedPlan == null} />
+        <AddToCartButton
+          product={product}
+          disabled={selectedPlan == null}
+          /* error={{ message: error, set: setError }} */
+        />
       </div>
     </>
   );
