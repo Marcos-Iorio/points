@@ -10,6 +10,11 @@ interface SelectPlanProps {
   error?: string | null;
 }
 
+interface CurrentSubscription {
+  plan: Plan;
+  clubName: string;
+}
+
 const SelectPlan = ({
   setSelectedPlan,
   selectedPlan,
@@ -17,23 +22,88 @@ const SelectPlan = ({
 }: SelectPlanProps) => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentSubscription, setCurrentSubscription] =
+    useState<CurrentSubscription | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
-    const fetchPlans = async () => {
-      const { data } = await supabase.from("plans").select().eq("active", true);
+    const fetchData = async () => {
+      // Obtener planes activos
+      const { data: plansData } = await supabase
+        .from("plans")
+        .select()
+        .eq("active", true);
 
-      if (data) {
-        setPlans(data);
+      if (plansData) {
+        setPlans(plansData);
       }
+
+      // Verificar si el usuario está logueado y tiene un plan
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: clubData } = await supabase
+          .from("clubs")
+          .select(
+            `
+            id,
+            name,
+            club_subscriptions (
+              id,
+              status,
+              plan:plans (*)
+            )
+          `
+          )
+          .eq("auth_user_id", user.id)
+          .single();
+
+        if (clubData?.club_subscriptions) {
+          const subscription = clubData.club_subscriptions as unknown as {
+            id: string;
+            status: string;
+            plan: Plan;
+          };
+
+          if (subscription.status === "active" && subscription.plan) {
+            setCurrentSubscription({
+              plan: subscription.plan,
+              clubName: clubData.name,
+            });
+          }
+        }
+      }
+
       setLoading(false);
     };
 
-    fetchPlans();
+    fetchData();
   }, []);
 
   if (loading) {
     return <div>Cargando planes...</div>;
+  }
+
+  if (currentSubscription) {
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+        <p className="text-green-800 font-bold text-lg mb-2">
+          Ya tenés un plan activo
+        </p>
+        <p className="text-green-700">
+          Tu club{" "}
+          <span className="font-semibold">{currentSubscription.clubName}</span>{" "}
+          ya cuenta con el plan{" "}
+          <span className="font-semibold">{currentSubscription.plan.name}</span>
+          .
+        </p>
+        <p className="text-green-600 text-sm mt-2">
+          No necesitás comprar un plan nuevo.
+        </p>
+      </div>
+    );
   }
 
   return (
