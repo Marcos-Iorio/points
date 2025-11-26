@@ -4,7 +4,7 @@ export type ProductType = {
   description: string;
   price: number;
   stock: number;
-  promotionPrice?: number;
+  promotion_price: number;
   images: IImages[];
   active: boolean;
 };

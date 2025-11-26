@@ -6,6 +6,8 @@ import { ProductType } from "@/types/product";
 import Images from "./images";
 import SelectPlan from "./select-plan";
 import { Plan } from "@/types/subscription";
+import { calculatePercentage } from "@/utils/calculate-percentage";
+import { formatPrice } from "@/utils/format-price";
 
 export interface ProductProps {
   product: ProductType;
@@ -32,7 +34,10 @@ const Product = ({ product }: ProductProps) => {
 
   const handleAddToCart = () => {
     if (!selectedPlan) {
-      setError({ type: "plan", message: "Seleccioná un plan antes de agregar al carrito" });
+      setError({
+        type: "plan",
+        message: "Seleccioná un plan antes de agregar al carrito",
+      });
       return false;
     }
     setError(null);
@@ -53,6 +58,13 @@ const Product = ({ product }: ProductProps) => {
           selectedPlan={selectedPlan}
           error={error?.type === "plan" ? error.message : null}
         />
+        <div>
+          <p>{formatPrice(product.promotion_price)}</p>
+          <p>{product.price}</p>
+        </div>
+        <p className="mt-auto">
+          -{calculatePercentage(product.price, product.promotion_price)}%
+        </p>
         <AddToCartButton
           product={product}
           disabled={selectedPlan == null}

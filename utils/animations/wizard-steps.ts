@@ -1,6 +1,4 @@
 import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollSmoother, ScrollTrigger } from "@/plugins";
 
 export const stepsAnimation = () => {
   const steps = document.querySelectorAll("#step");
