@@ -44,6 +44,8 @@ const Product = ({ product }: ProductProps) => {
     return true;
   };
 
+  const hasPromotion = product.promotion_price !== 0;
+
   return (
     <>
       <Images images={product.images || {}} />
@@ -58,18 +60,37 @@ const Product = ({ product }: ProductProps) => {
           selectedPlan={selectedPlan}
           error={error?.type === "plan" ? error.message : null}
         />
-        <div>
-          <p>{formatPrice(product.promotion_price)}</p>
-          <p>{product.price}</p>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-row items-end gap-4">
+            <div>
+              <p
+                className={`${
+                  hasPromotion
+                    ? "text-2xl text-text-secondary line-through"
+                    : "text-3xl text-text-primary font-bold"
+                }`}
+              >
+                {formatPrice(product.price)}
+              </p>
+              {hasPromotion && (
+                <p className="text-3xl font-bold text-text-primary">
+                  {formatPrice(product.promotion_price)}
+                </p>
+              )}
+            </div>
+            {hasPromotion && (
+              <p className="rounded-full bg-accent-primary text-xl font-bold px-3 py-1">
+                -{calculatePercentage(product.price, product.promotion_price)}%
+              </p>
+            )}
+          </div>
+
+          <AddToCartButton
+            product={product}
+            disabled={selectedPlan == null}
+            onAddToCart={handleAddToCart}
+          />
         </div>
-        <p className="mt-auto">
-          -{calculatePercentage(product.price, product.promotion_price)}%
-        </p>
-        <AddToCartButton
-          product={product}
-          disabled={selectedPlan == null}
-          onAddToCart={handleAddToCart}
-        />
       </div>
     </>
   );
