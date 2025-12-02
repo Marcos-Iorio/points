@@ -1,11 +1,11 @@
 "use client";
 
-import { ProductType } from "@/types/product";
+import { CartItem } from "@/types/cart";
 import React, { useState, createContext, ReactNode } from "react";
 
 type CartContextType = {
-  cartItems: ProductType[];
-  addToCart: (item: ProductType) => void;
+  cartItems: CartItem[];
+  addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
 };
 
@@ -16,11 +16,25 @@ export const CartContext = createContext<CartContextType>({
 });
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartItems, setCartItems] = useState<ProductType[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (item: ProductType) => {
-    console.log(item);
-    setCartItems((prev) => [...prev, item]);
+  const addToCart = (item: CartItem) => {
+    setCartItems((prev) => {
+      const existingItemIndex = prev.findIndex((i) => i.id === item.id);
+
+      if (existingItemIndex !== -1) {
+        // Si el producto ya existe, actualizar la cantidad
+        const updatedItems = [...prev];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + item.quantity,
+        };
+        return updatedItems;
+      }
+
+      // Si no existe, agregarlo al array
+      return [...prev, item];
+    });
   };
 
   const removeFromCart = (id: string) => {

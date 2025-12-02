@@ -28,7 +28,6 @@ const SelectPlan = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      // Obtener planes activos
       const { data: plansData } = await supabase
         .from("plans")
         .select()
@@ -72,6 +71,10 @@ const SelectPlan = ({
               plan: subscription.plan,
               clubName: clubData.name,
             });
+
+            console.log(subscription.plan);
+
+            setSelectedPlan(subscription.plan);
           }
         }
       }

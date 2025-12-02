@@ -21,6 +21,7 @@ export interface IError {
 export interface AddToCartButtonProps extends ProductProps {
   disabled: boolean;
   onAddToCart: () => boolean;
+  selectedPlan?: Plan | null;
 }
 
 const Product = ({ product }: ProductProps) => {
@@ -89,6 +90,7 @@ const Product = ({ product }: ProductProps) => {
             product={product}
             disabled={selectedPlan == null}
             onAddToCart={handleAddToCart}
+            selectedPlan={selectedPlan}
           />
         </div>
       </div>

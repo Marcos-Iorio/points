@@ -1,20 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import React from "react";
-import { AddToCartButtonProps, ProductProps } from "./product";
+import { AddToCartButtonProps } from "./product";
 import useCart from "@/hooks/useCart";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 
 const AddToCartButton = ({
   product,
   disabled,
   onAddToCart,
+  selectedPlan,
 }: AddToCartButtonProps) => {
   const [quantity, setQuantity] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const {
+    isLoading: isAdding,
+    isSuccess,
+    executeAction,
+  } = useAsyncAction(1000, 2000);
 
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
 
   const addQuantity = () => {
     setQuantity((prev) => prev + 1);
@@ -29,7 +36,7 @@ const AddToCartButton = ({
     setError(null);
   };
 
-  const sendToCart = () => {
+  const sendToCart = async () => {
     if (quantity === 0) {
       setError("Seleccioná una cantidad antes de agregar al carrito");
       return;
@@ -37,18 +44,26 @@ const AddToCartButton = ({
 
     // Validar con el padre (chequea plan)
     const isValid = onAddToCart();
+
     if (!isValid) {
       return;
     }
 
-    const newItem = {
-      ...product,
-      quantity: quantity,
-    };
+    await executeAction(() => {
+      const newItem = {
+        ...product,
+        quantity: quantity,
+        selectedPlan: selectedPlan || undefined,
+      };
 
-    addToCart(newItem);
-    setError(null);
+      addToCart(newItem);
+      setError(null);
+    });
   };
+
+  useEffect(() => {
+    setQuantity(0);
+  }, [isSuccess]);
 
   return (
     <div className="flex flex-col mt-auto justify-center w-full gap-2">
@@ -73,13 +88,52 @@ const AddToCartButton = ({
             <Minus className="w-5 h-auto" />
           </button>
         </div>
-        <Button
-          onClick={sendToCart}
-          disabled={false}
-          className="h-full flex-3/4 rounded-lg text-xl"
-        >
-          Agregar al carrito
-        </Button>
+        <div className="flex-3/4 flex justify-center items-center">
+          <Button
+            onClick={sendToCart}
+            disabled={isAdding || isSuccess}
+            className={`h-full w-full rounded-lg text-xl relative overflow-hidden transition-all duration-300 ${
+              isAdding && "w-15 rounded-full"
+            } ${isSuccess && "bg-accent-primary"}`}
+          >
+            <span
+              className={`transition-all duration-300 ${
+                isAdding || isSuccess ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              Agregar al carrito
+            </span>
+            {isAdding && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </span>
+            )}
+            {isSuccess && (
+              <span className="text-text-primary absolute inset-0 flex items-center justify-center font-bold text-xl">
+                ✓ Producto agregado
+              </span>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

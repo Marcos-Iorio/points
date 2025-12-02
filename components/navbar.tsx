@@ -114,7 +114,7 @@ const Navbar = () => {
       </div>
 
       <Link
-        href="/cart"
+        href="/checkout"
         className="border border-soft rounded-lg bg-surface hover:bg-hover-light flex justify-center items-center px-4 py-2 relative"
       >
         <ShoppingCart className="w-5" />
