@@ -11,8 +11,6 @@ import QuantityManager from "@/components/ui/QuantityManager/quantity-manager";
 const AddToCartButton = ({
   product,
   disabled,
-  onAddToCart,
-  selectedPlan,
 }: AddToCartButtonProps) => {
   const [quantity, setQuantity] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +20,7 @@ const AddToCartButton = ({
     executeAction,
   } = useAsyncAction(1000, 2000);
 
-  const { addToCart, cartItems } = useCart();
+  const { addToCart } = useCart();
 
   const addQuantity = () => {
     setQuantity((prev) => prev + 1);
@@ -43,18 +41,10 @@ const AddToCartButton = ({
       return;
     }
 
-    // Validar con el padre (chequea plan)
-    const isValid = onAddToCart();
-
-    if (!isValid) {
-      return;
-    }
-
     await executeAction(() => {
       const newItem = {
         ...product,
         quantity: quantity,
-        selectedPlan: selectedPlan || undefined,
       };
 
       addToCart(newItem);

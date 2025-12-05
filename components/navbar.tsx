@@ -20,10 +20,15 @@ const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [club, setClub] = useState<Club | null>(null);
   const [activeNav, setActiveNav] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const supabase = createClient();
 
   const { cartItems } = useCart();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const navItems = [
     { item: "Inicio", link: "/" },
@@ -118,9 +123,11 @@ const Navbar = () => {
         className="border border-soft rounded-lg bg-surface hover:bg-hover-light flex justify-center items-center px-4 py-2 relative"
       >
         <ShoppingCart className="w-5" />
-        <div className="absolute top-[-10px] right-[-10px] rounded-full bg-accent-secondary w-1 h-1 flex justify-center items-center text-sm font-normal p-3 border-2 border-white text-blue-800">
-          <p>{cartItems.length}</p>
-        </div>
+        {isMounted && (
+          <div className="absolute top-[-10px] right-[-10px] rounded-full bg-accent-secondary w-1 h-1 flex justify-center items-center text-sm font-normal p-3 border-2 border-white text-blue-800">
+            <p>{cartItems.length}</p>
+          </div>
+        )}
       </Link>
     </header>
   );

@@ -79,25 +79,27 @@ const Images = ({ images }: ImagesProps) => {
             </React.Fragment>
           ))}
         </div>
-        <div className="w-full relative" ref={imageContainerRef}>
-          <div className="absolute top-1/2 left-0 flex flex-row justify-between w-full px-10 m-auto z-20">
-            <Previous />
-            <Next />
+        <div className="w-full flex justify-center flex-col gap-5 items-center">
+          <div className="w-full relative " ref={imageContainerRef}>
+            <div className="absolute top-1/2 left-0 flex flex-row justify-between w-full px-10 m-auto z-20">
+              <Previous />
+              <Next />
+            </div>
+            <CustomMouse containerRef={imageContainerRef} imageRef={imageRef} />
+            <img
+              ref={imageRef}
+              src={getPublicImageUrl(images[activeImage].image_url)}
+              alt={"active-image"}
+              className="w-full rounded-lg z-0 cursor-none select-none"
+            />
           </div>
-          <CustomMouse containerRef={imageContainerRef} imageRef={imageRef} />
-          <img
-            ref={imageRef}
-            src={getPublicImageUrl(images[activeImage].image_url)}
-            alt={"active-image"}
-            className="w-full rounded-lg z-0 cursor-none select-none"
+          <Dots
+            totalDots={images.length}
+            active={activeImage}
+            setActiveDot={setActiveImage}
           />
         </div>
       </div>
-      <Dots
-        totalDots={images.length}
-        active={activeImage}
-        setActiveDot={setActiveImage}
-      />
     </section>
   );
 };

@@ -3,17 +3,22 @@
 import useCart from "@/hooks/useCart";
 import { formatPrice } from "@/utils/format-price";
 import Link from "next/link";
-import Image from "next/image";
+import SelectPlan from "@/components/shop/product/select-plan";
+import { useState } from "react";
+import { Plan } from "@/types/subscription";
 
 export default function CheckoutPage() {
   const { cartItems } = useCart();
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => {
+    const productsTotal = cartItems.reduce((total, item) => {
       const price = item.promotion_price || item.price;
-      const planPrice = item.selectedPlan?.price || 0;
-      return total + (price + planPrice) * item.quantity;
+      return total + price * item.quantity;
     }, 0);
+
+    const planPrice = selectedPlan?.price || 0;
+    return productsTotal + planPrice;
   };
 
   if (cartItems.length === 0) {
@@ -62,43 +67,56 @@ export default function CheckoutPage() {
 
                   <div className="space-y-1">
                     <p className="text-lg font-semibold">
-                      Producto: {formatPrice(item.promotion_price || item.price)}{" "}
+                      Precio unitario:{" "}
+                      {formatPrice(item.promotion_price || item.price)}{" "}
                       {item.promotion_price && (
                         <span className="text-sm text-text-secondary line-through ml-2">
                           {formatPrice(item.price)}
                         </span>
                       )}
                     </p>
-
-                    {item.selectedPlan && (
-                      <div className="bg-accent-secondary/20 rounded-lg p-3 mt-2">
-                        <p className="font-semibold">
-                          Plan de soporte: {item.selectedPlan.name}
-                        </p>
-                        <p className="text-sm text-text-secondary">
-                          {formatPrice(item.selectedPlan.price)} mensuales
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
 
                 <div className="text-right">
                   <p className="text-lg font-bold">
-                    {formatPrice(
-                      ((item.promotion_price || item.price) +
-                        (item.selectedPlan?.price || 0)) *
-                        item.quantity
-                    )}
+                    {formatPrice((item.promotion_price || item.price) * item.quantity)}
                   </p>
-                  <p className="text-sm text-text-secondary">Total</p>
+                  <p className="text-sm text-text-secondary">Subtotal</p>
                 </div>
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="mt-6 pt-6 border-t border-soft">
-            <div className="flex justify-between items-center text-2xl font-bold">
+        <div className="bg-surface border border-soft rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold mb-4">Plan de soporte</h2>
+          <SelectPlan setSelectedPlan={setSelectedPlan} selectedPlan={selectedPlan} />
+
+        </div>
+
+        <div className="bg-surface border border-soft rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold mb-4">Resumen de pago</h2>
+          <div className="space-y-3">
+            <div className="flex justify-between text-lg">
+              <span>Productos</span>
+              <span>
+                {formatPrice(
+                  cartItems.reduce(
+                    (total, item) =>
+                      total + (item.promotion_price || item.price) * item.quantity,
+                    0
+                  )
+                )}
+              </span>
+            </div>
+            {selectedPlan && (
+              <div className="flex justify-between text-lg">
+                <span>Plan {selectedPlan.name}</span>
+                <span>{formatPrice(selectedPlan.price)}/mes</span>
+              </div>
+            )}
+            <div className="pt-3 border-t border-soft flex justify-between items-center text-2xl font-bold">
               <span>Total</span>
               <span>{formatPrice(calculateTotal())}</span>
             </div>
