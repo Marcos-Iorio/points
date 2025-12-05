@@ -4,12 +4,51 @@ import useCart from "@/hooks/useCart";
 import { formatPrice } from "@/utils/format-price";
 import Link from "next/link";
 import SelectPlan from "@/components/shop/product/select-plan";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plan } from "@/types/subscription";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CheckoutPage() {
   const { cartItems } = useCart();
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [hasActivePlan, setHasActivePlan] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkActivePlan = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: clubData } = await supabase
+          .from("clubs")
+          .select(
+            `
+            id,
+            club_subscriptions (
+              status
+            )
+          `
+          )
+          .eq("auth_user_id", user.id)
+          .single();
+
+        if (clubData?.club_subscriptions) {
+          const subscription = clubData.club_subscriptions as unknown as {
+            status: string;
+          };
+
+          setHasActivePlan(subscription.status === "active");
+        }
+      }
+
+      setLoading(false);
+    };
+
+    checkActivePlan();
+  }, []);
 
   const calculateTotal = () => {
     const productsTotal = cartItems.reduce((total, item) => {
@@ -17,7 +56,8 @@ export default function CheckoutPage() {
       return total + price * item.quantity;
     }, 0);
 
-    const planPrice = selectedPlan?.price || 0;
+    // Solo sumar el plan si el usuario NO tiene plan activo y seleccionó uno
+    const planPrice = !hasActivePlan && selectedPlan ? selectedPlan.price : 0;
     return productsTotal + planPrice;
   };
 
@@ -80,7 +120,9 @@ export default function CheckoutPage() {
 
                 <div className="text-right">
                   <p className="text-lg font-bold">
-                    {formatPrice((item.promotion_price || item.price) * item.quantity)}
+                    {formatPrice(
+                      (item.promotion_price || item.price) * item.quantity
+                    )}
                   </p>
                   <p className="text-sm text-text-secondary">Subtotal</p>
                 </div>
@@ -91,8 +133,10 @@ export default function CheckoutPage() {
 
         <div className="bg-surface border border-soft rounded-lg p-6 mb-6">
           <h2 className="text-2xl font-bold mb-4">Plan de soporte</h2>
-          <SelectPlan setSelectedPlan={setSelectedPlan} selectedPlan={selectedPlan} />
-
+          <SelectPlan
+            setSelectedPlan={setSelectedPlan}
+            selectedPlan={selectedPlan}
+          />
         </div>
 
         <div className="bg-surface border border-soft rounded-lg p-6 mb-6">
@@ -104,16 +148,23 @@ export default function CheckoutPage() {
                 {formatPrice(
                   cartItems.reduce(
                     (total, item) =>
-                      total + (item.promotion_price || item.price) * item.quantity,
+                      total +
+                      (item.promotion_price || item.price) * item.quantity,
                     0
                   )
                 )}
               </span>
             </div>
-            {selectedPlan && (
+            {!hasActivePlan && selectedPlan && (
               <div className="flex justify-between text-lg">
                 <span>Plan {selectedPlan.name}</span>
                 <span>{formatPrice(selectedPlan.price)}/mes</span>
+              </div>
+            )}
+            {hasActivePlan && (
+              <div className="flex justify-between text-lg text-green-600">
+                <span>Plan de soporte</span>
+                <span>Tiene un plan asociado</span>
               </div>
             )}
             <div className="pt-3 border-t border-soft flex justify-between items-center text-2xl font-bold">

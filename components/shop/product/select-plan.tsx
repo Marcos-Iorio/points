@@ -110,10 +110,20 @@ const SelectPlan = ({
   }
 
   return (
-    <>
-      <h2 className="font-bold text-2xl">
+    <div className="flex gap-2 flex-col">
+      <h2 className="font-bold text-xl">
         Elegí el plan de soporte que más te convenga
       </h2>
+      <p className="text-text-secondary">
+        ¿No sabés como funcionan los planes de soporte?{" "}
+        <a
+          className="underline text-text-primary hover:text-accent-secondary"
+          href="/#planes"
+        >
+          Entrá acá
+        </a>{" "}
+        y conocé más.
+      </p>
       {error && (
         <p className="text-red-500 text-sm font-medium text-center animate-pulse">
           {error}
@@ -149,7 +159,7 @@ const SelectPlan = ({
           </article>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 
