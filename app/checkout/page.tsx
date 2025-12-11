@@ -7,12 +7,12 @@ import SelectPlan from "@/components/shop/product/select-plan";
 import { useState, useEffect } from "react";
 import { Plan } from "@/types/subscription";
 import { createClient } from "@/lib/supabase/client";
+import QuantityManager from "@/components/ui/QuantityManager/quantity-manager";
 
 export default function CheckoutPage() {
-  const { cartItems } = useCart();
+  const { cartItems, updateQuantity } = useCart();
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [hasActivePlan, setHasActivePlan] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const supabase = createClient();
 
   useEffect(() => {
@@ -43,8 +43,6 @@ export default function CheckoutPage() {
           setHasActivePlan(subscription.status === "active");
         }
       }
-
-      setLoading(false);
     };
 
     checkActivePlan();
@@ -101,10 +99,20 @@ export default function CheckoutPage() {
 
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-2">{item.name}</h3>
-                  <p className="text-text-secondary mb-2">
-                    Cantidad: {item.quantity}
-                  </p>
-
+                  <div className="mb-2 flex gap-4 items-center justify-start">
+                    <div>Cantidad seleccionada:</div>
+                    <QuantityManager
+                      className="max-w-24"
+                      value={item.quantity}
+                      onIncrement={() =>
+                        updateQuantity(item.id, item.quantity + 1)
+                      }
+                      onDecrement={() =>
+                        updateQuantity(item.id, item.quantity - 1)
+                      }
+                      min={1}
+                    />
+                  </div>
                   <div className="space-y-1">
                     <p className="text-lg font-semibold">
                       Precio unitario:{" "}
@@ -124,6 +132,9 @@ export default function CheckoutPage() {
                       (item.promotion_price || item.price) * item.quantity
                     )}
                   </p>
+                  <p className="text-text-secondary line-through">
+                    {formatPrice(item.price * item.quantity)}
+                  </p>
                   <p className="text-sm text-text-secondary">Subtotal</p>
                 </div>
               </div>
@@ -132,7 +143,9 @@ export default function CheckoutPage() {
         </div>
 
         <div className="bg-surface border border-soft rounded-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold mb-4">Plan de soporte</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-2xl font-bold">Plan de soporte</h2>
+          </div>
           <SelectPlan
             setSelectedPlan={setSelectedPlan}
             selectedPlan={selectedPlan}
@@ -181,19 +194,25 @@ export default function CheckoutPage() {
           </p>
         </div>
 
-        <div className="flex gap-4">
-          <Link
-            href="/shop"
-            className="flex-1 bg-hover-light text-text-primary px-6 py-3 rounded-lg text-center hover:bg-border font-semibold"
-          >
-            Seguir comprando
-          </Link>
-          <button
-            disabled
-            className="flex-1 bg-accent-primary/50 text-white px-6 py-3 rounded-lg font-semibold cursor-not-allowed"
-          >
-            Finalizar compra (Próximamente)
-          </button>
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <Link
+              href="/shop"
+              className="flex-1 bg-hover-light text-text-primary px-6 py-3 rounded-lg text-center hover:bg-border font-semibold"
+            >
+              Seguir comprando
+            </Link>
+            <button
+              disabled={!hasActivePlan && !selectedPlan}
+              className={`flex-1 px-6 py-3 rounded-lg font-semibold ${
+                !hasActivePlan && !selectedPlan
+                  ? "bg-accent-primary/50 text-white cursor-not-allowed"
+                  : "bg-accent-primary text-white hover:bg-accent-primary/80 cursor-pointer"
+              }`}
+            >
+              Finalizar compra
+            </button>
+          </div>
         </div>
       </div>
     </div>

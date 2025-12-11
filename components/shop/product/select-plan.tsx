@@ -3,6 +3,7 @@
 import { Plan } from "@/types/subscription";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { formatPrice } from "@/utils/format-price";
 
 interface SelectPlanProps {
   setSelectedPlan: Dispatch<SetStateAction<Plan | null>>;
@@ -33,49 +34,52 @@ const SelectPlan = ({
         .select()
         .eq("active", true);
 
-      if (plansData) {
+      if (plansData && plansData.length > 0) {
         setPlans(plansData);
-      }
 
-      // Verificar si el usuario está logueado y tiene un plan
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        // Verificar si el usuario está logueado y tiene un plan
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-      if (user) {
-        const { data: clubData } = await supabase
-          .from("clubs")
-          .select(
-            `
-            id,
-            name,
-            club_subscriptions (
+        if (user) {
+          const { data: clubData } = await supabase
+            .from("clubs")
+            .select(
+              `
               id,
-              status,
-              plan:plans (*)
+              name,
+              club_subscriptions (
+                id,
+                status,
+                plan:plans (*)
+              )
+            `
             )
-          `
-          )
-          .eq("auth_user_id", user.id)
-          .single();
+            .eq("auth_user_id", user.id)
+            .single();
 
-        if (clubData?.club_subscriptions) {
-          const subscription = clubData.club_subscriptions as unknown as {
-            id: string;
-            status: string;
-            plan: Plan;
-          };
+          if (clubData?.club_subscriptions) {
+            const subscription = clubData.club_subscriptions as unknown as {
+              id: string;
+              status: string;
+              plan: Plan;
+            };
 
-          if (subscription.status === "active" && subscription.plan) {
-            setCurrentSubscription({
-              plan: subscription.plan,
-              clubName: clubData.name,
-            });
-
-            console.log(subscription.plan);
-
-            setSelectedPlan(subscription.plan);
+            if (subscription.status === "active" && subscription.plan) {
+              setCurrentSubscription({
+                plan: subscription.plan,
+                clubName: clubData.name,
+              });
+              setSelectedPlan(subscription.plan);
+            } else {
+              setSelectedPlan(plansData[1] || plansData[0]);
+            }
+          } else {
+            setSelectedPlan(plansData[1] || plansData[0]);
           }
+        } else {
+          setSelectedPlan(plansData[1] || plansData[0]);
         }
       }
 
@@ -145,8 +149,8 @@ const SelectPlan = ({
             <p className="text-lg font-bold">{plan.name}</p>
             <p className="text-md font-normal">{plan.description}</p>
             <p className="font-bold">
-              ${plan.price}{" "}
-              <span className="font-normal text-sm">mensuales</span>
+              {formatPrice(plan.price)}
+              <span className="font-normal text-sm"> mensuales</span>
             </p>
 
             <div className="border border-black rounded-full w-5 h-5 grid place-content-center absolute top-2 left-2">
